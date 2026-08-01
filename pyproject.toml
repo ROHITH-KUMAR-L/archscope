@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "depsight"
+version = "0.1.0"
+description = "Static dependency-graph analysis for Python, JavaScript/TypeScript, and C++"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "depsight contributors"}
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "networkx>=3.0",
+    "typer[all]>=0.9",
+    "rich>=13.0",
+]
+optional-dependencies.temporal = ["gitpython>=3.1"]
+optional-dependencies.test = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+]
+optional-dependencies.tree-sitter = [
+    "tree-sitter>=0.20",
+    "tree-sitter-python>=0.20",
+    "tree-sitter-javascript>=0.20",
+    "tree-sitter-typescript>=0.20",
+    "tree-sitter-cpp>=0.20",
+]
+
+[project.scripts]
+depsight = "depsight.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/your-org/depsight"
+Repository = "https://github.com/your-org/depsight"
+Issues = "https://github.com/your-org/depsight/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/depsight"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "W", "UP", "B", "C4", "PTH"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
