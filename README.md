@@ -1,81 +1,137 @@
-# depsight
+# archscope — Dependency Graph Analysis Engine
 
-Static dependency-graph analysis for Python, JavaScript/TypeScript, and C++.
+> Detect cycles, find critical files, compute safe build order, and measure blast-radius impact using classical graph algorithms — no API keys, no network, no dashboard required.
 
-Detects cycles, finds critical files (articulation points), computes safe build
-ordering, measures blast-radius impact, and ranks refactoring priority using a
-Minimum Feedback Arc Set approximation.
+![Language](https://img.shields.io/badge/Language-Python%203.11%2B-blue) ![CLI](https://img.shields.io/badge/CLI-Typer-4B8BBE) ![Graph](https://img.shields.io/badge/Graph-NetworkX-orange) ![Optional](https://img.shields.io/badge/Optional-GitPython%20%2F%20tree--sitter-9cf) ![License](https://img.shields.io/badge/License-MIT-brightgreen)
+
+---
+
+## Executive Summary
+
+`archscope` is a pip-installable Python library and CLI that statically analyzes Python, JavaScript/TypeScript, and C++ codebases, builds a directed dependency graph, and runs graph algorithms against it to surface architectural risk.
+
+It is a pure, deterministic analysis engine — not a web app, not a visualization tool, not AI-powered. It runs fully offline (aside from the optional local git-mining feature) and is built to drop into CI pipelines, pre-commit hooks, and agent sessions without a running server or a browser.
+
+| | |
+|---|---|
+| **Cycle detection** | Find circular dependencies with full cycle paths |
+| **Build ordering** | Compute a safe topological build order |
+| **Critical files** | Identify articulation points — single points of failure |
+| **Parallel waves** | Group files into build layers that can run concurrently |
+| **Blast radius** | See what breaks if you change a given file |
+| **Refactor plan** | Rank the minimum edges to cut to make the graph acyclic (MFAS) |
+| **Temporal coupling** | Mine git history for hidden co-change relationships *(optional)* |
+
+---
 
 ## Installation
 
 ```bash
-pip install depsight
-# or with temporal (git history) analysis:
-pip install "depsight[temporal]"
+pip install archscope
+
+# with temporal (git history) analysis:
+pip install "archscope[temporal]"
 ```
 
-## Usage
+Requires **Python 3.11+**.
 
-### CLI
+---
+
+## Quick start
+
+```bash
+archscope scan ./my-project --fail-on-cycle
+```
+
+Human-readable output in your terminal, non-zero exit code if a cycle is found. Wire it into CI and you're done.
+
+---
+
+## CLI
 
 ```bash
 # Scan a project
-depsight scan ./my-project
+archscope scan ./my-project
 
-# Scan with specific languages
-depsight scan ./my-project --lang python,javascript
+# Scan only specific languages
+archscope scan ./my-project --lang python,javascript
 
-# Only run specific algorithms
-depsight scan ./my-project --only cycles,articulation
+# Run a subset of algorithms
+archscope scan ./my-project --only cycles,articulation
 
 # Output formats
-depsight scan ./my-project --format json -o report.json
-depsight scan ./my-project --format markdown -o report.md
+archscope scan ./my-project --format json -o report.json
+archscope scan ./my-project --format markdown -o report.md
 
 # CI mode: exit code 1 if cycles found
-depsight scan ./my-project --fail-on-cycle
+archscope scan ./my-project --fail-on-cycle
 
-# Blast radius impact analysis
-depsight impact ./my-project --file utils.py
+# Blast-radius impact analysis for a single file
+archscope impact ./my-project --file utils.py
 
-# Temporal coupling (requires [temporal] extra)
-depsight temporal ./my-project --max-commits 30 --min-cochange 2
+# Temporal coupling (requires the [temporal] extra)
+archscope temporal ./my-project --max-commits 30 --min-cochange 2
 ```
 
-### Python API
+<details>
+<summary><strong>All flags</strong></summary>
+
+| Flag | Description |
+|---|---|
+| `--lang` | Comma-separated list of languages to include |
+| `--only` | Comma-separated list of algorithms to run |
+| `--format` | `text` (default), `json`, or `markdown` |
+| `-o, --output` | Write report to a file instead of stdout |
+| `--fail-on-cycle` | Exit with code `1` if any cycle is detected |
+| `--max-commits` | *(temporal)* Number of commits to mine |
+| `--min-cochange` | *(temporal)* Minimum co-change count to report a coupling |
+
+</details>
+
+---
+
+## Python API
 
 ```python
-from depsight import analyze
+from archscope import analyze
 
 result = analyze("/path/to/project")
 
-# Access results
 result.cycles                 # list of Cycle objects
 result.build_order            # topological order, or None if cycles exist
 result.articulation_points    # list of ArticulationPoint objects
 result.build_waves            # parallel build layers, or None if cyclic
 result.mfas                   # edges to remove for acyclic refactoring
-result.impact                 # ImpactResult for a changed file (if requested)
+result.impact                 # ImpactResult for a changed file, if requested
 ```
 
-For formatted output, use the formatter functions directly:
+Format the result however you need:
 
 ```python
-from depsight.report import format_json, format_markdown, format_table
+from archscope.report import format_json, format_markdown, format_table
 
 print(format_json(result))
 print(format_markdown(result))
 print(format_table(result))
 ```
 
+---
+
 ## Architecture
 
-- `parsers/` — produces edge lists only (source, target, import type, line).
-  Never touches `networkx` or graph algorithms.
-- `graph/` — pure graph algorithms. Never knows what language produced its edges.
-- `temporal/` — optional git history mining (requires `depsight[temporal]`).
+```
+parsers/   →  produces edge lists only (source, target, import type, line)
+               never touches networkx or graph algorithms
 
-This boundary means adding a 4th language is a parser-only change.
+graph/     →  pure graph algorithms
+               never knows what language produced its edges
+
+temporal/  →  optional git history mining (requires archscope[temporal])
+```
+
+This boundary is deliberate: adding a 4th language is a **parser-only** change — the graph algorithms don't change at all.
+
+---
 
 ## Testing
 
@@ -83,6 +139,8 @@ This boundary means adding a 4th language is a parser-only change.
 pip install -e ".[test]"
 pytest tests/ -v
 ```
+
+---
 
 ## License
 

@@ -2,7 +2,7 @@
 
 import networkx as nx
 
-from depsight.graph import (
+from archscope.graph import (
     DependencyGraph,
     analyze_impact,
     build_wave_layers,
@@ -11,7 +11,7 @@ from depsight.graph import (
     run_mfas,
     topological_sort,
 )
-from depsight.graph.builder import Edge
+from archscope.graph.builder import Edge
 
 
 class TestDependencyGraph:

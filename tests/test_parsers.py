@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from depsight.parsers.cpp_parser import parse_cpp_project
-from depsight.parsers.js_parser import parse_js_project
-from depsight.parsers.python_parser import parse_python_project
+from archscope.parsers.cpp_parser import parse_cpp_project
+from archscope.parsers.js_parser import parse_js_project
+from archscope.parsers.python_parser import parse_python_project
 
 
 class TestPythonParser:

@@ -1,7 +1,7 @@
 """Report models and formatters."""
 
-from depsight.report.formatter import format_json, format_markdown, format_table
-from depsight.report.models import AnalysisResult, ArticulationPoint, Cycle, ImpactResult
+from archscope.report.formatter import format_json, format_markdown, format_table
+from archscope.report.models import AnalysisResult, ArticulationPoint, Cycle, ImpactResult
 
 __all__ = [
     "AnalysisResult",

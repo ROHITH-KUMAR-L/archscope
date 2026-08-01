@@ -4,7 +4,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from depsight.cli import app
+from archscope.cli import app
 
 runner = CliRunner()
 
@@ -47,7 +47,7 @@ class TestScanCommand:
         project = Path(__file__).parent / "fixtures" / "python_complex"
         result = runner.invoke(app, ["scan", str(project), "--format", "markdown"])
         assert result.exit_code == 0
-        assert "depsight Analysis Report" in result.stdout
+        assert "archscope Analysis Report" in result.stdout
 
     def test_scan_only_flag(self) -> None:
         project = Path(__file__).parent / "fixtures" / "python_complex_cyclic"

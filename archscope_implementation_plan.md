@@ -1,4 +1,4 @@
-# depsight — Implementation Plan (Core Engine)
+# archscope — Implementation Plan (Core Engine)
 
 Standalone Python library + CLI, extracted from CodeLens's analysis engine. This is Phase 1 —
 build and ship this fully before starting the MCP server wrapper. The MCP server has nothing to
@@ -47,7 +47,7 @@ dashboard.
   falling back to the existing regex parsers when not installed (same fallback behavior you
   already documented in CodeLens)
 - `GitPython` — only required if temporal analysis is used; make it an optional extra
-  (`depsight[temporal]`), don't force everyone to install it
+  (`archscope[temporal]`), don't force everyone to install it
 - CLI framework: `typer` (built on `click`, gives you `--help` generation and type-hint-based
   argument parsing for free — less boilerplate than raw `argparse`)
 - `pytest` for testing
@@ -58,7 +58,7 @@ dashboard.
 ### Non-functional requirements
 - Zero network calls required for core functionality (parsing + graph algorithms run fully
   offline)
-- No required API keys — this must work out of the box with `pip install depsight` and nothing
+- No required API keys — this must work out of the box with `pip install archscope` and nothing
   else, given the whole point is CI/agent-friendliness
 - Must run standalone from the CodeLens web app — no shared runtime state, no import of
   `backend.app` or anything FastAPI-shaped
@@ -68,13 +68,13 @@ dashboard.
 ## 3. Architecture
 
 ```
-depsight/
+archscope/
 ├── pyproject.toml
 ├── README.md
 ├── LICENSE
 ├── CHANGELOG.md
 ├── src/
-│   └── depsight/
+│   └── archscope/
 │       ├── __init__.py              # public API: analyze(), and re-exports
 │       ├── parsers/
 │       │   ├── __init__.py          # parse_project() orchestrator + language dispatch
@@ -95,7 +95,7 @@ depsight/
 │       │   ├── __init__.py
 │       │   ├── models.py            # plain dataclasses/Pydantic models, NOT FastAPI-coupled
 │       │   └── formatter.py         # JSON / terminal-table / markdown renderers
-│       └── cli.py                   # typer app, entry point for `depsight` command
+│       └── cli.py                   # typer app, entry point for `archscope` command
 └── tests/
     ├── conftest.py
     ├── test_parsers.py
@@ -124,7 +124,7 @@ themselves (which are already done).
 ## 4. Public API
 
 ```python
-from depsight import analyze
+from archscope import analyze
 
 result = analyze("/path/to/project")
 
@@ -140,8 +140,8 @@ result.to_markdown()
 
 ```python
 # Direct module access for anyone who wants just one piece
-from depsight.parsers import parse_project
-from depsight.graph import DependencyGraph, detect_cycles, find_articulation_points, analyze_impact
+from archscope.parsers import parse_project
+from archscope.graph import DependencyGraph, detect_cycles, find_articulation_points, analyze_impact
 
 parse_result = parse_project("/path/to/project")
 graph = DependencyGraph.build_from_files(parse_result)
@@ -151,7 +151,7 @@ impact = analyze_impact(graph.nx_graph, changed_file="utils.py")
 
 ```python
 # Temporal — explicit opt-in, separate import path, requires the [temporal] extra
-from depsight.temporal import mine_temporal_patterns
+from archscope.temporal import mine_temporal_patterns
 
 temporal = mine_temporal_patterns(repo_path="/path/to/repo", max_commits=30, min_cochange=2)
 ```
@@ -161,19 +161,19 @@ temporal = mine_temporal_patterns(repo_path="/path/to/repo", max_commits=30, min
 ## 5. CLI Design
 
 ```bash
-pip install depsight
-# or: pip install "depsight[temporal]" for git-mining support
+pip install archscope
+# or: pip install "archscope[temporal]" for git-mining support
 
-depsight scan ./my-project
-depsight scan ./my-project --lang python,typescript
-depsight scan ./my-project --only cycles,articulation
-depsight scan ./my-project --format json -o report.json
-depsight scan ./my-project --format markdown -o report.md
-depsight scan ./my-project --fail-on-cycle          # CI mode, non-zero exit on cycle found
+archscope scan ./my-project
+archscope scan ./my-project --lang python,typescript
+archscope scan ./my-project --only cycles,articulation
+archscope scan ./my-project --format json -o report.json
+archscope scan ./my-project --format markdown -o report.md
+archscope scan ./my-project --fail-on-cycle          # CI mode, non-zero exit on cycle found
 
-depsight impact ./my-project --file utils.py         # standalone blast-radius command
+archscope impact ./my-project --file utils.py         # standalone blast-radius command
 
-depsight temporal ./my-project --max-commits 30 --min-cochange 2   # requires [temporal] extra
+archscope temporal ./my-project --max-commits 30 --min-cochange 2   # requires [temporal] extra
 ```
 
 ---
@@ -217,10 +217,10 @@ depsight temporal ./my-project --max-commits 30 --min-cochange 2   # requires [t
   it belongs in `analyze()` instead
 
 ### Step 7: Temporal analysis as an optional extra
-- Port `temporal.py` into `depsight/temporal/`
+- Port `temporal.py` into `archscope/temporal/`
 - Define it as an optional dependency group in `pyproject.toml`:
-  `depsight[temporal]` pulls in `GitPython`; base install doesn't
-- CLI command should give a clear error ("install depsight[temporal] to use this") rather than
+  `archscope[temporal]` pulls in `GitPython`; base install doesn't
+- CLI command should give a clear error ("install archscope[temporal] to use this") rather than
   a raw `ImportError` if the extra isn't installed
 
 ### Step 8: Wire up CI
@@ -230,14 +230,14 @@ depsight temporal ./my-project --max-commits 30 --min-cochange 2   # requires [t
   single most important feature for adoption (see prior conversation: this is the killer feature)
 
 ### Step 9: Package for PyPI
-- Publish to **TestPyPI first**, verify `pip install depsight --index-url
+- Publish to **TestPyPI first**, verify `pip install archscope --index-url
   https://test.pypi.org/simple/` actually works from a clean environment
 - Then publish to real PyPI
 - Tag a `v0.1.0` release on GitHub matching the PyPI version
 
 ### Step 10: Point CodeLens's FastAPI backend at the new package
-- Replace the in-repo copies of parsers/algorithms with `pip install -e ../depsight` (local dev)
-  or `pip install depsight` (once published)
+- Replace the in-repo copies of parsers/algorithms with `pip install -e ../archscope` (local dev)
+  or `pip install archscope` (once published)
 - This is the step that proves the extraction actually worked — the original app becomes a
   *consumer* of the new library instead of owning duplicate logic
 - Delete the now-redundant code from the CodeLens backend once this is confirmed working
@@ -291,7 +291,7 @@ depsight temporal ./my-project --max-commits 30 --min-cochange 2   # requires [t
 
 ### Temporal (optional extra)
 - [ ] Port `mine_temporal_patterns`
-- [ ] Define `depsight[temporal]` extra in `pyproject.toml`
+- [ ] Define `archscope[temporal]` extra in `pyproject.toml`
 - [ ] Graceful error when extra isn't installed but temporal command is invoked
 - [ ] Build a small fixture git repo for testing (fabricated commit history)
 
@@ -304,7 +304,7 @@ depsight temporal ./my-project --max-commits 30 --min-cochange 2   # requires [t
 - [ ] Tag GitHub release matching PyPI version
 
 ### Integration back into CodeLens
-- [ ] Point CodeLens's FastAPI backend at the new `depsight` package
+- [ ] Point CodeLens's FastAPI backend at the new `archscope` package
 - [ ] Delete redundant duplicated logic from the CodeLens repo
 - [ ] Confirm CodeLens's existing 64-test suite (whatever remains after this migration) still
       passes end to end

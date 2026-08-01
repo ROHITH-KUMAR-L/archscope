@@ -6,7 +6,7 @@ from pathlib import Path
 
 import networkx as nx
 
-from depsight.graph import (
+from archscope.graph import (
     DependencyGraph,
     analyze_impact,
     build_wave_layers,
@@ -15,8 +15,8 @@ from depsight.graph import (
     run_mfas,
     topological_sort,
 )
-from depsight.parsers import parse_cpp_project, parse_js_project, parse_python_project
-from depsight.report.models import AnalysisResult, ArticulationPoint, Cycle, ImpactResult
+from archscope.parsers import parse_cpp_project, parse_js_project, parse_python_project
+from archscope.report.models import AnalysisResult, ArticulationPoint, Cycle, ImpactResult
 
 
 def analyze(
@@ -88,7 +88,7 @@ def analyze(
 
     temporal_patterns = []
     if include_temporal:
-        from depsight.temporal import mine_temporal_patterns
+        from archscope.temporal import mine_temporal_patterns
         if mine_temporal_patterns:
             temporal_patterns = mine_temporal_patterns(root, max_commits, min_cochange)
 
