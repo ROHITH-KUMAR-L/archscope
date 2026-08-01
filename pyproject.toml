@@ -45,9 +45,9 @@ optional-dependencies.tree-sitter = [
 depsight = "depsight.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/your-org/depsight"
-Repository = "https://github.com/your-org/depsight"
-Issues = "https://github.com/your-org/depsight/issues"
+Homepage = "https://github.com/ROHITH-KUMAR-L/depsight"
+Repository = "https://github.com/ROHITH-KUMAR-L/depsight"
+Issues = "https://github.com/ROHITH-KUMAR-L/depsight/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/depsight"]
