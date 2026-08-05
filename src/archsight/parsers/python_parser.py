@@ -37,12 +37,27 @@ def _resolve_import(root_path: Path, source_file: Path, module: str, level: int)
     return None
 
 
+_EXCLUDED_DIRS = {
+    ".venv", "venv", "__pycache__", ".git", "node_modules",
+    "build", "dist", ".eggs", ".pytest_cache", ".ruff_cache",
+    ".idea", ".vscode", ".tox", ".mypy_cache", ".cache",
+}
+
+
+def _is_excluded(path: Path, root: Path) -> bool:
+    for parent in path.parents:
+        if parent == root:
+            break
+        if parent.name in _EXCLUDED_DIRS:
+            return True
+    return False
+
+
 def parse_python_project(root: str | Path) -> list[Edge]:
     edges: list[Edge] = []
     root_path = Path(root)
 
-    # First pass: collect all Python files for resolution
-    py_files = list(root_path.rglob("*.py"))
+    py_files = [f for f in root_path.rglob("*.py") if not _is_excluded(f, root_path)]
     module_to_file = {}
     for py_file in py_files:
         rel = py_file.relative_to(root_path)
@@ -60,7 +75,7 @@ def parse_python_project(root: str | Path) -> list[Edge]:
         try:
             content = py_file.read_text(encoding="utf-8")
             tree = ast.parse(content, filename=str(py_file))
-        except (SyntaxError, UnicodeDecodeError):
+        except (SyntaxError, UnicodeDecodeError, PermissionError, OSError):
             continue
 
         rel_path = str(py_file.relative_to(root_path))

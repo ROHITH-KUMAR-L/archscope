@@ -21,14 +21,32 @@ _INCLUDE_RE = re.compile(
 )
 
 
+_EXCLUDED_DIRS = {
+    ".venv", "venv", "__pycache__", ".git", "node_modules",
+    "build", "dist", ".eggs", ".pytest_cache", ".ruff_cache",
+    ".idea", ".vscode", ".tox", ".mypy_cache", ".cache",
+}
+
+
+def _is_excluded(path: Path, root: Path) -> bool:
+    for parent in path.parents:
+        if parent == root:
+            break
+        if parent.name in _EXCLUDED_DIRS:
+            return True
+    return False
+
+
 def parse_cpp_project(root: str | Path) -> list[Edge]:
     edges: list[Edge] = []
     root_path = Path(root)
 
     for cpp_file in root_path.rglob("*.[ch]*"):
+        if _is_excluded(cpp_file, root_path):
+            continue
         try:
             content = cpp_file.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, PermissionError, OSError):
             continue
 
         rel_path = str(cpp_file.relative_to(root_path))
