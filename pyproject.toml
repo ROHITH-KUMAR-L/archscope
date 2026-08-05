@@ -24,7 +24,7 @@ classifiers = [
 ]
 dependencies = [
     "networkx>=3.0",
-    "typer[all]>=0.9",
+    "typer>=0.9",
     "rich>=13.0",
 ]
 optional-dependencies.temporal = ["gitpython>=3.1"]
