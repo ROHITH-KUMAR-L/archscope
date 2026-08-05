@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "archscope"
+name = "archsight"
 version = "0.1.0"
 description = "Static dependency-graph analysis for Python, JavaScript/TypeScript, and C++"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "archscope contributors"}
+    {name = "archsight contributors"}
 ]
 requires-python = ">=3.11"
 classifiers = [
@@ -42,15 +42,15 @@ optional-dependencies.tree-sitter = [
 ]
 
 [project.scripts]
-archscope = "archscope.cli:app"
+archsight = "archsight.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/ROHITH-KUMAR-L/archscope"
-Repository = "https://github.com/ROHITH-KUMAR-L/archscope"
-Issues = "https://github.com/ROHITH-KUMAR-L/archscope/issues"
+Homepage = "https://github.com/ROHITH-KUMAR-L/archsight"
+Repository = "https://github.com/ROHITH-KUMAR-L/archsight"
+Issues = "https://github.com/ROHITH-KUMAR-L/archsight/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/archscope"]
+packages = ["src/archsight"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

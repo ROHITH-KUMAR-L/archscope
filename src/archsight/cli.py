@@ -8,11 +8,11 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from archscope import analyze
-from archscope.report import format_json, format_markdown, format_table
+from archsight import analyze
+from archsight.report import format_json, format_markdown, format_table
 
 app = typer.Typer(
-    name="archscope",
+    name="archsight",
     help="Static dependency-graph analysis for Python, JavaScript/TypeScript, and C++",
     add_completion=False,
 )
@@ -152,20 +152,20 @@ output: Path | None = typer.Option(  # noqa: B008
         None, "--output", "-o", help="Write output to file"
     ),
 ):
-    """Mine git history for temporal coupling patterns (requires archscope[temporal])."""
+    """Mine git history for temporal coupling patterns (requires archsight[temporal])."""
     try:
-        from archscope.temporal import mine_temporal_patterns
+        from archsight.temporal import mine_temporal_patterns
     except ImportError:
         console.print("[red]Temporal analysis requires the [temporal] extra.[/red]")
         console.print(
-            "Install with: [cyan]pip install archscope[temporal][/cyan]"
+            "Install with: [cyan]pip install archsight[temporal][/cyan]"
         )
         raise typer.Exit(code=1) from None
 
     if mine_temporal_patterns is None:
         console.print(
             "[red]GitPython not installed. "
-            "Install with: pip install archscope[temporal][/red]"
+            "Install with: pip install archsight[temporal][/red]"
         )
         raise typer.Exit(code=1) from None
 

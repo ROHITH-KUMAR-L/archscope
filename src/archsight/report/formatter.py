@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from archscope.report.models import AnalysisResult
+from archsight.report.models import AnalysisResult
 
 
 def format_json(result: AnalysisResult) -> str:
@@ -13,7 +13,7 @@ def format_json(result: AnalysisResult) -> str:
 
 def format_markdown(result: AnalysisResult) -> str:
     lines = [
-        "# archscope Analysis Report",
+        "# archsight Analysis Report",
         "",
         f"**Project:** {result.project_path}",
         f"**Languages:** {', '.join(result.languages) if result.languages else 'none detected'}",
@@ -82,7 +82,7 @@ def format_table(result: AnalysisResult) -> str:
     lines = []
 
     # Summary
-    lines.append("archscope Summary")
+    lines.append("archsight Summary")
     lines.append("=" * 50)
     lines.append(f"Project:          {result.project_path}")
     lines.append(f"Languages:        {', '.join(result.languages) if result.languages else 'none'}")

@@ -1,4 +1,4 @@
-# archscope — Dependency Graph Analysis Engine
+# archsight — Dependency Graph Analysis Engine
 
 > Detect cycles, find critical files, compute safe build order, and measure blast-radius impact using classical graph algorithms — no API keys, no network, no dashboard required.
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-`archscope` is a pip-installable Python library and CLI that statically analyzes Python, JavaScript/TypeScript, and C++ codebases, builds a directed dependency graph, and runs graph algorithms against it to surface architectural risk.
+`archsight` is a pip-installable Python library and CLI that statically analyzes Python, JavaScript/TypeScript, and C++ codebases, builds a directed dependency graph, and runs graph algorithms against it to surface architectural risk.
 
 It is a pure, deterministic analysis engine — not a web app, not a visualization tool, not AI-powered. It runs fully offline (aside from the optional local git-mining feature) and is built to drop into CI pipelines, pre-commit hooks, and agent sessions without a running server or a browser.
 
@@ -27,10 +27,10 @@ It is a pure, deterministic analysis engine — not a web app, not a visualizati
 ## Installation
 
 ```bash
-pip install archscope
+pip install archsight
 
 # with temporal (git history) analysis:
-pip install "archscope[temporal]"
+pip install "archsight[temporal]"
 ```
 
 Requires **Python 3.11+**.
@@ -40,7 +40,7 @@ Requires **Python 3.11+**.
 ## Quick start
 
 ```bash
-archscope scan ./my-project --fail-on-cycle
+archsight scan ./my-project --fail-on-cycle
 ```
 
 Human-readable output in your terminal, non-zero exit code if a cycle is found. Wire it into CI and you're done.
@@ -51,26 +51,26 @@ Human-readable output in your terminal, non-zero exit code if a cycle is found. 
 
 ```bash
 # Scan a project
-archscope scan ./my-project
+archsight scan ./my-project
 
 # Scan only specific languages
-archscope scan ./my-project --lang python,javascript
+archsight scan ./my-project --lang python,javascript
 
 # Run a subset of algorithms
-archscope scan ./my-project --only cycles,articulation
+archsight scan ./my-project --only cycles,articulation
 
 # Output formats
-archscope scan ./my-project --format json -o report.json
-archscope scan ./my-project --format markdown -o report.md
+archsight scan ./my-project --format json -o report.json
+archsight scan ./my-project --format markdown -o report.md
 
 # CI mode: exit code 1 if cycles found
-archscope scan ./my-project --fail-on-cycle
+archsight scan ./my-project --fail-on-cycle
 
 # Blast-radius impact analysis for a single file
-archscope impact ./my-project --file utils.py
+archsight impact ./my-project --file utils.py
 
 # Temporal coupling (requires the [temporal] extra)
-archscope temporal ./my-project --max-commits 30 --min-cochange 2
+archsight temporal ./my-project --max-commits 30 --min-cochange 2
 ```
 
 <details>
@@ -93,7 +93,7 @@ archscope temporal ./my-project --max-commits 30 --min-cochange 2
 ## Python API
 
 ```python
-from archscope import analyze
+from archsight import analyze
 
 result = analyze("/path/to/project")
 
@@ -108,7 +108,7 @@ result.impact                 # ImpactResult for a changed file, if requested
 Format the result however you need:
 
 ```python
-from archscope.report import format_json, format_markdown, format_table
+from archsight.report import format_json, format_markdown, format_table
 
 print(format_json(result))
 print(format_markdown(result))
@@ -126,7 +126,7 @@ parsers/   →  produces edge lists only (source, target, import type, line)
 graph/     →  pure graph algorithms
                never knows what language produced its edges
 
-temporal/  →  optional git history mining (requires archscope[temporal])
+temporal/  →  optional git history mining (requires archsight[temporal])
 ```
 
 This boundary is deliberate: adding a 4th language is a **parser-only** change — the graph algorithms don't change at all.

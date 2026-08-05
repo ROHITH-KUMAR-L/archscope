@@ -1,4 +1,4 @@
-"""Temporal analysis via git history mining — requires archscope[temporal] extra."""
+"""Temporal analysis via git history mining — requires archsight[temporal] extra."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def mine_temporal_patterns(
     min_cochange: int = 2,
 ) -> list[TemporalPattern]:
     if Repo is None:
-        raise ImportError("GitPython not installed. Install with: pip install archscope[temporal]")
+        raise ImportError("GitPython not installed. Install with: pip install archsight[temporal]")
 
     repo = Repo(repo_path)
     if repo.bare:
